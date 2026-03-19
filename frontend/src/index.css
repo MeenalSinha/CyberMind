@@ -1,0 +1,194 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    @apply bg-neutral-50 text-neutral-900 font-sans;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 { @apply font-display; }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-card border border-neutral-100;
+  }
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium px-5 py-2.5 rounded-xl
+           transition-all duration-150 shadow-sm hover:shadow-md active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-white hover:bg-neutral-50 text-neutral-700 font-medium px-5 py-2.5 rounded-xl
+           border border-neutral-200 transition-all duration-150 hover:shadow-sm active:scale-95;
+  }
+  .btn-danger {
+    @apply bg-danger-500 hover:bg-danger-600 text-white font-medium px-5 py-2.5 rounded-xl
+           transition-all duration-150 active:scale-95;
+  }
+  .btn-success {
+    @apply bg-success-500 hover:bg-success-600 text-white font-medium px-5 py-2.5 rounded-xl
+           transition-all duration-150 active:scale-95;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
+  }
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white
+           focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-400 transition-all;
+  }
+  .progress-bar {
+    @apply h-2 rounded-full bg-neutral-100 overflow-hidden;
+  }
+  .progress-fill {
+    @apply h-full rounded-full bg-gradient-to-r from-primary-500 to-teal-500 transition-all duration-700;
+  }
+  .module-card {
+    @apply card p-6 cursor-pointer transition-all duration-200
+           hover:shadow-card-hover hover:-translate-y-1;
+  }
+
+  /* ── Answer feedback cards ─────────────────────────────── */
+  .feedback-correct {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    animation: correctBurst 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .feedback-wrong {
+    background-color: #fff1f2;
+    border: 1px solid #fecdd3;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    animation: wrongFlash 0.5s ease-out;
+  }
+
+  /* ── Threat highlight ring (Social RPG critical steps) ─── */
+  .threat-ring {
+    @apply animate-threat-glow rounded-xl;
+  }
+
+  /* ── Score counter number ──────────────────────────────── */
+  .score-tick {
+    @apply animate-score-flash inline-block;
+  }
+
+  /* ── Badge earned state ────────────────────────────────── */
+  .badge-earned {
+    @apply animate-badge-pop;
+  }
+
+  /* ── Page transition wrapper ───────────────────────────── */
+  .page-enter {
+    @apply animate-fade-in;
+  }
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { @apply bg-neutral-100 rounded-full; }
+::-webkit-scrollbar-thumb { @apply bg-neutral-300 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-neutral-400; }
+
+/* ── Chat bubbles ─────────────────────────────────────────────── */
+.chat-bubble-in {
+  @apply bg-white border border-neutral-200 text-neutral-800
+         rounded-2xl rounded-tl-md px-4 py-3 shadow-sm max-w-xs text-sm
+         animate-slide-up;
+}
+.chat-bubble-out {
+  @apply bg-primary-600 text-white
+         rounded-2xl rounded-tr-md px-4 py-3 shadow-sm max-w-xs text-sm
+         animate-slide-down;
+}
+
+/* ── Animated score number (Dashboard StatCard) ───────────────── */
+@keyframes countUpNum {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stat-number {
+  animation: countUpNum 0.5s ease-out both;
+}
+
+/* ── Danger shake for wrong-answer button row ─────────────────── */
+.shake-row {
+  animation: shake 0.45s ease-in-out;
+}
+
+/* ── Confetti particles (pure CSS, no JS lib) ────────────────── */
+.confetti-wrap {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  top: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+}
+
+/* ── Score +N floating chip ──────────────────────────────────── */
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  70%  { opacity: 1; transform: translateY(-28px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-44px) scale(0.9); }
+}
+.score-float {
+  animation: floatUp 0.9s ease-out forwards;
+  position: absolute;
+  pointer-events: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #16a34a;
+  z-index: 50;
+  white-space: nowrap;
+}
+.score-float-wrong {
+  color: #dc2626;
+}
+
+/* ── Smooth page transitions ─────────────────────────────────── */
+.route-enter { animation: fadeIn 0.25s ease-out; }
+
+/* ── Loading spinner ─────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 0.75s linear infinite;
+}
+
+/* ── Typing dots (WhatsApp-style indicator) ──────────────── */
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30%           { transform: translateY(-6px); }
+}
+.typing-dot {
+  animation: typingBounce 1s ease-in-out infinite;
+}
+
+/* ── Login feature card entrance ─────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Smooth number counter ───────────────────────────────── */
+.count-change {
+  animation: scoreFlash 0.5s ease-out;
+}

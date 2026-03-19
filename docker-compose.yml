@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cybermind_backend
+    restart: unless-stopped
+    environment:
+      - SECRET_KEY=${SECRET_KEY:?SECRET_KEY is required}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost}
+      # FIX: point DB file into the mounted volume so data persists
+      - DATABASE_URL=sqlite+aiosqlite:////app/data/cybermind.db
+    volumes:
+      # FIX: mount volume to /app/data — matches DATABASE_URL path above
+      - cybermind_db:/app/data
+    expose:
+      - "8000"   # internal only — not published to host directly
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health | grep -q '\"db\":\"ok\"'"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cybermind_frontend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-80}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  cybermind_db:
+    driver: local
