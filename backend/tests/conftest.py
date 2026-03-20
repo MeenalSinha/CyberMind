@@ -7,22 +7,25 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from database import Base, get_db
 from main import app
 
-# ── In-memory SQLite for tests — never touches the real DB ───────────────────
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
-test_engine = create_async_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
-TestSession  = async_sessionmaker(test_engine, expire_on_commit=False, class_=AsyncSession)
+
+@pytest_asyncio.fixture(scope="session")
+async def db_engine():
+    """Single engine for the whole test session."""
+    engine = create_async_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield engine
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture(scope="function")
-async def db_session():
-    """Creates a fresh in-memory DB for each test function."""
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    async with TestSession() as session:
+async def db_session(db_engine):
+    """Fresh session per test — rolls back after each test."""
+    session_factory = async_sessionmaker(db_engine, expire_on_commit=False, class_=AsyncSession)
+    async with session_factory() as session:
         yield session
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest_asyncio.fixture(scope="function")
