@@ -7,8 +7,6 @@ import re
 
 from database import get_db, User
 from auth_utils import verify_password, get_password_hash, create_access_token
-# FIX: import the SHARED limiter from main — not a new instance
-from limiter import limiter
 
 router = APIRouter()
 
@@ -44,7 +42,6 @@ class LoginRequest(BaseModel):
 
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
-@limiter.limit("10/minute")
 async def signup(request: Request, req: SignupRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == req.email.lower()))
     if result.scalar_one_or_none():
@@ -73,7 +70,6 @@ async def signup(request: Request, req: SignupRequest, db: AsyncSession = Depend
 
 
 @router.post("/login")
-@limiter.limit("20/minute")
 async def login(request: Request, req: LoginRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == req.email.lower()))
     user   = result.scalar_one_or_none()
