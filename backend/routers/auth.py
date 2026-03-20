@@ -12,7 +12,7 @@ from limiter import limiter
 
 router = APIRouter()
 
-_DUMMY_HASH = "$2b$12$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+_DUMMY_HASH = "$2b$12$zzzzzzzzzzzzzzzzzzzzzuTQAFCg/NnUhbMC3iO6QMiJBJEMGkUGO"
 
 
 class SignupRequest(BaseModel):
